@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+        <groupId><%= parentGroupId %></groupId>
+	    <artifactId><%= baseName %>-parent</artifactId>
+	    <version>0.0.1-SNAPSHOT</version>
+		<relativePath>../<%= baseName %>-parent/pom.xml</relativePath>
+	</parent>
+	<artifactId><%= currentPath %></artifactId>
+	<packaging><%= packagingType %></packaging>
+	<dependencies>
+		<dependency>
+			<groupId><%= parentGroupId %></groupId>
+			<artifactId><%= baseName %>-bundle-web</artifactId>
+			<type>war</type>
+		</dependency>
+		<dependency>
+		  	<groupId>weblogic</groupId>
+		  	<artifactId>wlfullclient</artifactId>
+		  	<version>10.3.4</version>
+		  	<scope>provided</scope>
+		</dependency>	
+	</dependencies>
+	<profiles>
+		<profile>
+			<id>profile-local</id>
+			<properties>
+				<skip.deploy>true</skip.deploy>
+			</properties>
+		</profile>
+		<profile>
+			<id>profile-dev</id>
+			<build>
+				<plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <source>1.7</source>
+                            <target>1.7</target>
+                            <encoding>UTF-8</encoding>
+                        </configuration>
+                    </plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>echo</id>
+								<phase>install</phase>
+								<configuration>
+									<target unless="skip.deploy">
+										<property name="maven.compile.classpath" refid="maven.compile.classpath" />
+										<ant antfile="${basedir}/build.xml">
+											<target name="deploy" />
+										</ant>
+									</target>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-ear-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<!-- Tell Maven we are using Java EE 6 -->
+					<version>6</version>
+					<!-- Use Java EE ear libraries as needed. Java EE ear libraries are in easy way to package any libraries needed in the ear, and automatically have 
+						any modules (EJB-JARs and WARs) use them -->
+					<defaultLibBundleDir>APP-INF/lib</defaultLibBundleDir>
+					<earSourceDirectory>${basedir}/src/main/application</earSourceDirectory>
+					<filtering>true</filtering>
+					<modules>
+						<!-- Register our War as a web module, and set the context root -->
+						<webModule>
+							<groupId><%= parentGroupId %></groupId>
+							<artifactId><%= baseName %>-bundle-web</artifactId>
+							<!-- Define the context root for the webapp -->
+							<contextRoot>/${bundle-web-context-root}</contextRoot>
+						</webModule>
+					</modules>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -1,0 +1,122 @@
+<project name="${project.name}" basedir="." default="build" >
+
+    <property environment="env"/>
+    <property file="src/main/resources/${ant.project.name}.properties"/>
+    <property name="web" location="src/main/webapp" />
+    <property name="web.inf" location="${web}/WEB-INF" />
+    <property name="lib" location="${web.inf}/lib" />
+    <property name="classes" location="${web.inf}/classes" />
+    <property name="src"  	location="src/main/java" />
+    <property name="resources"  location="src/main/resources" />
+    <property name="dist" 	location="target" />
+    <property name="build" 	location="build" />
+    <property name="build.target" 	location="${build}/${ant.project.name}.war" />
+    <property name="build.lib" location="build-only"/>
+
+    <path id="build.path">
+        <fileset dir="${lib}" includes="*.jar" />
+        <fileset dir="${build.lib}" includes="*.jar" />
+        <pathelement path="${classes}" />
+    </path>
+
+    <target name="clean" description="clean up">
+        <!-- Delete the ${build} and ${dist} directory trees if exists-->
+        <echo message="${ant.project.name}:-----------------Cleaning build folders"/>
+        <delete dir="${build}"/>
+        <delete dir="${dist}"/>
+    </target>
+
+    <target name="init" depends="clean">
+        <!-- Create the build directory structure used by compile -->
+        <echo message="${ant.project.name}:-----------------Creating build folders"/>
+        <mkdir dir="${build}"/>
+        <mkdir dir="${dist}"/>
+    </target>
+
+    <target name="pre-compile" >
+        <delete dir="${build.target}/WEB-INF/classes"/>
+        <mkdir dir="${build.target}/WEB-INF/classes"/>
+    </target>
+
+    <target name="compile">
+        <echo message="${ant.project.name}:-----------------Compiling sources and copying resources"/>
+        <javac srcdir="${src}" destdir="${classes}" debug="on" classpathref="build.path"/>
+    </target>
+
+    <target name="build" description="compile the source " depends="init,pre-compile,compile,createWar">
+        <!-- Compile the java code from ${src} into ${build} -->
+        <!-- Copy resources-->
+        <copy todir="${build.target}/WEB-INF/classes">
+            <fileset dir="${resources}" includes="**/*.*"/>
+        </copy>
+    </target>
+
+    <target name="prepareWar" depends="init">
+        <echo message="${ant.project.name}:-----------------Preparing war structure"/>
+        <mkdir  dir="${build.target}"/>
+        <copy todir="${build.target}">
+            <fileset dir="${web}" includes="**/*.*"/>
+        </copy>
+    </target>
+
+    <target name="createWar" depends="prepareWar" description="generate the distribution" >
+        <!-- Put everything in ${build} into the war file in dist -->
+        <echo message="${ant.project.name}:-----------------Creating  build war file "/>
+        <war jarfile="${dist}/${ant.project.name}.war" basedir="${build.target}"/>
+    </target>
+
+    <target name="autodeploy" description="deploy to weblogic server" depends="createWar">
+        <condition  property="${weblogic.home}" value="${env.WEBLOGIC_HOME}">
+            <available resource="${env.WEBLOGIC_HOME}" />
+        </condition>
+        <echo message="Deploying to weblogic home:${weblogic.home} domain:${weblogic.domain}"/>
+        <copy todir="${weblogic.autodeploy}" file="${dist}/${ant.project.name}.war"/>
+    </target>
+
+    <!--Deploy to weblogic-->
+
+    <property environment="env"/>
+
+    <taskdef name="wldeploy" classname="weblogic.ant.taskdefs.management.WLDeploy" classpath="${maven.compile.classpath}"/>
+
+
+
+    <target name="deploy" description="Deploy ear to WLS" >
+        <echo message=" ------------------------------------------------------------------------"/>
+        <echo message=" Deploying to Server: ${server.definition}"/>
+        <echo message=" ------------------------------------------------------------------------"/>
+
+        <antcall target="deployWithConfig"/>
+        <antcall target="deployWithUser"/>
+    </target>
+
+    <target name="deployWithUser" description="Deploy ear to WLS with user" unless="${userConfigDefined}">
+        <echo message="Deploying using user admin (user value:${isUserConfigDefined})"/>
+        <wldeploy
+                user="${admin.user}"
+                password="${admin.password}"
+                adminurl="t3://localhost:7001"
+                targets="${target}"
+                action="${action}"
+                source="./target/<%= baseName %>-bundle-app-0.0.1-SNAPSHOT.ear"
+                name="${project.name}"
+                upload="true"
+                verbose="true"
+        />
+    </target>
+
+    <target name="deployWithConfig" description="Deploy ear to WLS with user config" if="${userConfigDefined}">
+        <echo message=" Deploying using configuration file (user value:${isUserConfigDefined})"/>
+        <wldeploy
+                action="${action}"
+                name="${project.name}"
+                source="./target/${project.build.finalName}.ear"
+                userConfigFile="${weblogic.configfile}"
+                userKeyFile="${weblogic.keyfile}"
+                adminurl="${server.url}"
+                targets="${target}"
+                upload="true"
+                verbose="true"		/>
+    </target>
+
+</project>

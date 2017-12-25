@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+        <groupId><%= parentGroupId %></groupId>
+	    <artifactId><%= baseName %>-parent</artifactId>
+	    <version>0.0.1-SNAPSHOT</version>
+		<relativePath>../<%= baseName %>-parent/pom.xml</relativePath>
+	</parent>
+	<artifactId><%= currentPath %></artifactId>
+	<packaging><%= packagingType %></packaging>
+	<modules>
+		<module>../<%= baseName %>-core-service</module>
+		<module>../<%= baseName %>-core-api</module>
+		<module>../<%= baseName %>-core-model</module>
+		<module>../<%= baseName %>-core-domain</module>
+	</modules>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId><%= parentGroupId %></groupId>
+				<artifactId><%= baseName %>-core-api</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId><%= parentGroupId %></groupId>
+				<artifactId><%= baseName %>-core-domain</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId><%= parentGroupId %></groupId>
+				<artifactId><%= baseName %>-core-model</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId><%= parentGroupId %></groupId>
+				<artifactId><%= baseName %>-core-service</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId><%= parentGroupId %></groupId>
+				<artifactId><%= baseName %>-core-test</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>2.3.1</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>
+
+ 
