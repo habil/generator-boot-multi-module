@@ -1,6 +1,6 @@
 {
   "name": "generator-boot-multi-module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Yeoman Generator for Multi Module Spring Boot ",
   "keywords": [
     "yeoman-generator"
