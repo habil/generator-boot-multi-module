@@ -11,6 +11,24 @@ Install yo generator;
 $ npm install -g yo
 ```
 
+Create a directory for the project
+
+```
+$ mkdir multi-module-boot-project && cd multi-module-boot-project
+```
+
+Install boot-multi-module package
+
+```
+$ npm i generator-boot-multi-module
+```
+And run like this
+
+```
+$ yo boot-multi-module
+```
+##  Installation with source code
+
 Checkout npm package from git;
 ```
 $ https://github.com/habil/generator-boot-multi-module.git
