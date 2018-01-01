@@ -175,7 +175,7 @@ BootMultiModuleGenerator.prototype.app = function app() {
         }
     }
     
-    this.template('.gitignore', + '.gitignore');
+    //this.template('.gitignore', + '.gitignore');
 
     // if ('gradle' === this.buildTool[0]) {
     //     this.template('build.gradle', 'build.gradle');
